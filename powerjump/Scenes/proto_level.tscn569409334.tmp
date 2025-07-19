@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://m8s76c6gpujt"]
+
+[ext_resource type="PackedScene" uid="uid://dsmoyb6imugbx" path="res://Scenes/Environment/test_block.tscn" id="1_p4yaa"]
+[ext_resource type="PackedScene" uid="uid://cenioqnrin3u0" path="res://Scenes/player.tscn" id="2_p4yaa"]
+
+[node name="ProtoLevel" type="Node2D"]
+
+[node name="test_block" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-265, -26)
+scale = Vector2(-156.818, 1.51145)
+
+[node name="Player" parent="." instance=ExtResource("2_p4yaa")]
+position = Vector2(-143, -235)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
