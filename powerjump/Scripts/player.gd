@@ -1,16 +1,20 @@
 extends CharacterBody2D
 
-const DEFAULT_FALL_GRAVITY: float = 3000  # Up from 2200
-const DEFAULT_RISE_GRAVITY: float = 2200  # Up from 1600
-const JUMP_VELOCITY_MULTIPLIER: float = -1200  # Up from -1000
+const DEFAULT_FALL_GRAVITY: float = 3000
+const DEFAULT_RISE_GRAVITY: float = 2200
+const JUMP_VELOCITY_MULTIPLIER: float = -1200
 const MAX_JUMP_HOLD_TIME: float = 1.3
-const HORIZONTAL_SPEED: float = 800  # Up from 600
-const MAX_FALL_SPEED: float = 2200  # Up from 1600
+const HORIZONTAL_SPEED: float = 800
+const MAX_FALL_SPEED: float = 2200
 const MIN_JUMP_HOLD_TIME: float = 0.125
 
+
+#player variables
+#from the scene
 @onready var bodySprite = $BodySprite
 @onready var faceSprite = $FaceSprite
-#player variables
+
+#properties
 var player_state: states
 var jump_hold_time: float
 var fall_gravity: float
@@ -94,7 +98,6 @@ func handle_physics(delta) -> void:
 				else:
 					# Falling - use fall gravity
 					velocity.y += fall_gravity * delta
-				
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
 			
