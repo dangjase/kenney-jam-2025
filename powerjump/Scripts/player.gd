@@ -24,7 +24,8 @@ enum states {
 	GROUNDED,
 	CHARGING,
 	LAUNCH,
-	AIRBORNE
+	AIRBORNE,
+	DEBUGFLY
 }
 
 func _ready() -> void:
@@ -38,6 +39,12 @@ func _physics_process(delta) -> void:
 	handle_physics(delta)
 	move_and_slide()
 
+func debug_input_vector():
+	var input_vector = Vector2.ZERO
+	input_vector.x = Input.get_action_strength('move_right') - Input.get_action_strength('move_left')
+	input_vector.y = Input.get_action_strength('move_down') - Input.get_action_strength('jump')
+	input_vector = input_vector.normalized()
+	return input_vector
 
 func handle_input(delta) -> void:
 	match player_state:
@@ -60,6 +67,10 @@ func handle_input(delta) -> void:
 			pass
 		states.AIRBORNE:
 			pass	
+		states.DEBUGFLY:
+			pass
+	if Input.is_action_just_pressed("noclip"):
+		player_state = states.DEBUGFLY
 
 func handle_physics(delta) -> void:
 	match player_state:
@@ -100,6 +111,7 @@ func handle_physics(delta) -> void:
 					velocity.y += fall_gravity * delta
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
-			
+		states.DEBUGFLY:
+			set_velocity(debug_input_vector() * 5000)
 
 	
