@@ -11,6 +11,8 @@ const MIN_JUMP_HOLD_TIME: float = 0.125
 # Animation constants
 const HAND_WAVE_SPEED: float = 5.0
 const HAND_WAVE_AMPLITUDE: float = 30.0
+const HAND_WAVE_CHARGE_SPEED: float = 30.0
+const HAND_WAVE_CHARGE_AMPLITUDE: float = 10.0
 const HAND_OFFSET_X: float = 75.0  # Base horizontal distance from body
 const HAND_AIR_OFFSET_X: float = 50.0
 const HAND_BASE_Y: float = 10.0     # Base vertical position relative to body
@@ -133,6 +135,9 @@ func change_player_state(new_state) -> void:
 			handLeftSprite.play('closed')
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
 			handLeftSprite.rotation_degrees = HAND_ROTATION_UP
+			faceSprite.play('face_a')
+			faceSprite.position.y = 0
+			faceSprite.position.x = 0
 		states.CHARGING:
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
@@ -161,8 +166,8 @@ func handle_animation(delta) -> void:
 
 		states.CHARGING:
 			var charge_progress = jump_hold_time / MAX_JUMP_HOLD_TIME
-			var wave  = sin(animation_time * HAND_WAVE_SPEED) * HAND_WAVE_AMPLITUDE
-			var height = -100 * charge_progress
+			var wave  = sin(animation_time * HAND_WAVE_CHARGE_SPEED) * HAND_WAVE_CHARGE_AMPLITUDE
+			var height = -160 * charge_progress
 			_set_hand_pose(
 				Vector2(-HAND_OFFSET_X + wave * 0.3, height + wave),
 				Vector2( HAND_OFFSET_X - wave * 0.3, height - wave),
@@ -179,6 +184,7 @@ func handle_animation(delta) -> void:
 
 		states.AIRBORNE:
 			_update_airborne_hands()
+			_update_airborne_face()
 
 
 # Helper functions for animation
@@ -188,6 +194,32 @@ func _set_hand_pose(left_pos: Vector2, right_pos: Vector2, desired_rotation: flo
 	handRightSprite.position = right_pos
 	handLeftSprite.rotation_degrees  = desired_rotation
 	handRightSprite.rotation_degrees = desired_rotation
+
+func _update_airborne_face() -> void:
+	# Target positions based on velocity
+	var target_y = 0
+	var target_x = 0
+	
+	if velocity.y < 0:
+		faceSprite.play('face_a_up')
+		target_y = -20
+	elif velocity.y > 0:
+		faceSprite.play('face_a_down')
+		target_y = 20
+	else:
+		faceSprite.play('face_a')
+		target_y = 0
+		
+	if velocity.x < 0:
+		target_x = -15
+	elif velocity.x > 0:
+		target_x = 15
+	else:
+		target_x = 0
+	
+	# Smooth interpolation (adjust the 0.15 value to control speed)
+	faceSprite.position.y = lerp(float(faceSprite.position.y), float(target_y), 0.15)
+	faceSprite.position.x = lerp(float(faceSprite.position.x), float(target_x), 0.15)
 
 func _update_airborne_hands() -> void:
 	var wave_speed = 24.0 if direction_input != 0 else 12.0
@@ -214,7 +246,7 @@ func _update_airborne_hands() -> void:
 	_set_hand_pose(
 		Vector2(-base_spread + air_wave + movement_offset, HAND_BASE_Y - velocity_influence),
 		Vector2( base_spread - air_wave + movement_offset, HAND_BASE_Y - velocity_influence),
-		base_rotation
+					base_rotation
 	)
 
 func _compute_base_rotation(vel_y: float, dir: float) -> float:
