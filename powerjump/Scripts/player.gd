@@ -7,6 +7,7 @@ const MAX_JUMP_HOLD_TIME: float = 1.3
 const HORIZONTAL_SPEED: float = 800
 const MAX_FALL_SPEED: float = 2200
 const MIN_JUMP_HOLD_TIME: float = 0.125
+const WALL_BOUNCE_DAMPENING: float = 0.5 # How much speed is kept after a wall bounce
 
 # Animation constants
 const HAND_WAVE_SPEED: float = 5.0
@@ -40,6 +41,7 @@ var fall_gravity: float
 var rise_gravity: float
 var direction_input: float
 var animation_time: float = 0.0  # Track time for animations
+var last_velocity: Vector2 = Vector2.ZERO # Store velocity from the previous frame
 
 enum states {
 	GROUNDED,
@@ -60,6 +62,7 @@ func _process(delta) -> void:
 func _physics_process(delta) -> void:
 	handle_input(delta)
 	handle_physics(delta)
+	last_velocity = velocity # Store velocity before any physics calculations
 	move_and_slide()
 
 
@@ -103,13 +106,6 @@ func handle_physics(delta) -> void:
 				change_player_state(states.GROUNDED)
 				velocity.x = 0
 				velocity.y = 0
-			elif (is_on_wall()):
-				#TODO: handle wall bounce
-				pass
-			elif(is_on_ceiling()):
-				#TODO: handle ceiling bounce
-				velocity.y = 0  # Reset vertical velocity on ceiling hit
-				velocity.y += fall_gravity * delta
 			else:
 				# Apply different gravity based on vertical movement
 				if velocity.y < 0:
@@ -122,6 +118,12 @@ func handle_physics(delta) -> void:
 				else:
 					# Falling - use fall gravity
 					velocity.y += fall_gravity * delta
+				if (is_on_wall()): #Bounce off wall
+					velocity.x = -1 * last_velocity.x * WALL_BOUNCE_DAMPENING
+
+					# Update direction_input to match the new velocity direction
+					#NOTE: the player did not actually change input, but we use this to calculate the hand animation
+					direction_input = sign(velocity.x) 
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
 			

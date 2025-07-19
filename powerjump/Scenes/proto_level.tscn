@@ -203,3 +203,27 @@ position = Vector2(-81, 0)
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(1, -235)
 zoom = Vector2(0.4, 0.4)
+
+[node name="test_block2" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -308)
+
+[node name="test_block3" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -391)
+
+[node name="test_block4" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -473)
+
+[node name="test_block5" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -556)
+
+[node name="test_block6" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -308)
+
+[node name="test_block7" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -391)
+
+[node name="test_block8" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -473)
+
+[node name="test_block9" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -556)
