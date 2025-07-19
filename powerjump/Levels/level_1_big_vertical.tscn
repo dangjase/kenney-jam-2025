@@ -116,7 +116,7 @@ texture_region_size = Vector2i(64, 64)
 5:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 6:4/0 = 0
 7:4/0 = 0
-7:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+7:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -25.4013, -21.1678, -32, 32, -32, 32, 32, 3.10461, 24.8369, -11.5717, 15.2408, -16.0875, 1.69342, -26.1694, -4.13675, -32, -6.65477)
 8:4/0 = 0
 8:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 9:4/0 = 0
@@ -297,12 +297,13 @@ texture_region_size = Vector2i(64, 64)
 [sub_resource type="TileSet" id="TileSet_7xydp"]
 tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
-physics_layer_0/collision_priority = 0.0
+physics_layer_1/collision_layer = 2
 sources/1 = SubResource("TileSetAtlasSource_3ypgb")
 
 [node name="LevelVertical" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_8yv6y")]
+position = Vector2(1304, -296)
 
 [node name="LevelBackground" type="Sprite2D" parent="."]
 z_index = -4096
