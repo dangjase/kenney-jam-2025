@@ -152,95 +152,81 @@ func handle_animation(delta) -> void:
 	
 	match player_state:
 		states.GROUNDED:
-			# Subtle idle hand motion
-			var idle_wave = sin(animation_time * 2) * 10
-			handLeftSprite.position.x = -HAND_OFFSET_X
-			handLeftSprite.position.y = HAND_BASE_Y + idle_wave
-			handRightSprite.position.x = HAND_OFFSET_X
-			handRightSprite.position.y = HAND_BASE_Y - idle_wave  # Opposite phase
-			
-		states.CHARGING:
-			# Hands move up as charge increases
-			var charge_progress = jump_hold_time / MAX_JUMP_HOLD_TIME
-			var wave_intensity = sin(animation_time * HAND_WAVE_SPEED) * HAND_WAVE_AMPLITUDE
-			var height = -100 * charge_progress  # Move hands up as charge increases
-			
-			handLeftSprite.position.x = -HAND_OFFSET_X + (wave_intensity * 0.3)
-			handLeftSprite.position.y = height + wave_intensity
-			handRightSprite.position.x = HAND_OFFSET_X - (wave_intensity * 0.3)
-			handRightSprite.position.y = height - wave_intensity
-			
-		states.LAUNCH:
-			# Quick upward motion
-			handLeftSprite.position.x = -HAND_OFFSET_X
-			handLeftSprite.position.y = -HAND_WAVE_AMPLITUDE * 2
-			handRightSprite.position.x = HAND_OFFSET_X
-			handRightSprite.position.y = -HAND_WAVE_AMPLITUDE * 2
-			
-		states.AIRBORNE:
-			var wave_speed = 12
-			if direction_input != 0:
-				wave_speed = 24
-			var air_wave = sin(animation_time * wave_speed) * 15
-			
-			var velocity_scale = 150
-			var normalized_velocity = velocity.y / MAX_FALL_SPEED
-			
-			# Apply asymmetric gravity for better jump feel
-			var velocity_influence = velocity_scale * (
-				normalized_velocity if normalized_velocity < 0 
-				else normalized_velocity * 1.3
+			var idle_wave = sin(animation_time * 4) * 10
+			_set_hand_pose(
+				Vector2(-HAND_OFFSET_X, HAND_BASE_Y + idle_wave),
+				Vector2(HAND_OFFSET_X,  HAND_BASE_Y - idle_wave),
+				HAND_ROTATION_UP
 			)
-			velocity_influence = clamp(velocity_influence, -velocity_scale, velocity_scale * 1.3)
-			
-			# Scale movement offset based on distance from body
-			var vertical_scale = 1.0 + (abs(velocity_influence) / velocity_scale) * HAND_MOVEMENT_SCALE
-			var movement_offset = -direction_input * HAND_MOVEMENT_OFFSET * vertical_scale
-			
-			var base_spread = HAND_AIR_OFFSET_X
-			if direction_input != 0:
-				base_spread = HAND_AIR_OFFSET_X - (abs(direction_input) * 35.0)
-			
-			var base_rotation = HAND_ROTATION_UP
-			
-			if direction_input != 0:
-				if velocity.y < -50:
-					base_rotation = HAND_ROTATION_UP_RIGHT if direction_input > 0 else HAND_ROTATION_UP_LEFT
-				elif velocity.y > 50:
-					base_rotation = HAND_ROTATION_DOWN_RIGHT if direction_input > 0 else HAND_ROTATION_DOWN_LEFT
-			else:
-				if velocity.y < -50:
-					base_rotation = HAND_ROTATION_DOWN
-				elif velocity.y > 50:
-					base_rotation = HAND_ROTATION_UP
-					
-			# Smooth rotation transition near apex of jump
-			if abs(velocity.y) < 100:
-				var t = (abs(velocity.y) - 50) / 50.0
-				t = clamp(t, 0, 1)
-				if velocity.y < 0:
-					var target_rotation
-					if direction_input > 0:
-						target_rotation = HAND_ROTATION_UP_RIGHT
-					elif direction_input < 0:
-						target_rotation = HAND_ROTATION_UP_LEFT
-					else:
-						target_rotation = HAND_ROTATION_DOWN
-					base_rotation = lerp(HAND_ROTATION_UP, target_rotation, t)
-				else:
-					var target_rotation
-					if direction_input > 0:
-						target_rotation = HAND_ROTATION_DOWN_RIGHT
-					elif direction_input < 0:
-						target_rotation = HAND_ROTATION_DOWN_LEFT
-					else:
-						target_rotation = HAND_ROTATION_UP
-					base_rotation = lerp(target_rotation, HAND_ROTATION_UP, t)
-			
-			handLeftSprite.position.x = -base_spread + air_wave + movement_offset
-			handLeftSprite.position.y = HAND_BASE_Y - velocity_influence
-			handLeftSprite.rotation_degrees = base_rotation
-			
-			handRightSprite.position.x = base_spread - air_wave + movement_offset
-			handRightSprite.position.y = HAND_BASE_Y - velocity_influence
-			handRightSprite.rotation_degrees = base_rotation
+
+		states.CHARGING:
+			var charge_progress = jump_hold_time / MAX_JUMP_HOLD_TIME
+			var wave  = sin(animation_time * HAND_WAVE_SPEED) * HAND_WAVE_AMPLITUDE
+			var height = -100 * charge_progress
+			_set_hand_pose(
+				Vector2(-HAND_OFFSET_X + wave * 0.3, height + wave),
+				Vector2( HAND_OFFSET_X - wave * 0.3, height - wave),
+				HAND_ROTATION_UP
+			)
+
+		states.LAUNCH:
+			var y_offset = -HAND_WAVE_AMPLITUDE * 2
+			_set_hand_pose(
+				Vector2(-HAND_OFFSET_X, y_offset),
+				Vector2( HAND_OFFSET_X,  y_offset),
+				HAND_ROTATION_DOWN
+			)
+
+		states.AIRBORNE:
+			_update_airborne_hands()
+
+
+# Helper functions for animation
+
+func _set_hand_pose(left_pos: Vector2, right_pos: Vector2, desired_rotation: float) -> void:
+	handLeftSprite.position  = left_pos
+	handRightSprite.position = right_pos
+	handLeftSprite.rotation_degrees  = desired_rotation
+	handRightSprite.rotation_degrees = desired_rotation
+
+func _update_airborne_hands() -> void:
+	var wave_speed = 24.0 if direction_input != 0 else 12.0
+	var air_wave   = sin(animation_time * wave_speed) * 15.0
+
+	# Vertical influence (hands move depending on fall/rise speed)
+	var velocity_scale      = 150.0
+	var normalized_velocity = clamp(velocity.y / MAX_FALL_SPEED, -1.0, 1.0)
+	var velocity_influence  = velocity_scale * (normalized_velocity if normalized_velocity < 0 else normalized_velocity * 1.3)
+	velocity_influence      = clamp(velocity_influence, -velocity_scale, velocity_scale * 1.3)
+
+	# Horizontal influence / spread
+	var vertical_scale   = 1.0 + abs(velocity_influence) / velocity_scale * HAND_MOVEMENT_SCALE
+	var movement_offset  = -direction_input * HAND_MOVEMENT_OFFSET * vertical_scale
+	var base_spread      = HAND_AIR_OFFSET_X if direction_input == 0 else HAND_AIR_OFFSET_X - abs(direction_input) * 35.0
+
+	# Determine rotation and smooth it near the apex
+	var base_rotation = _compute_base_rotation(velocity.y, direction_input)
+	if abs(velocity.y) < 100:
+		var t = clamp((abs(velocity.y) - 50.0) / 50.0, 0.0, 1.0)
+		var apex_rotation = _compute_apex_rotation(velocity.y, direction_input)
+		base_rotation = lerp(apex_rotation, base_rotation, t)
+
+	_set_hand_pose(
+		Vector2(-base_spread + air_wave + movement_offset, HAND_BASE_Y - velocity_influence),
+		Vector2( base_spread - air_wave + movement_offset, HAND_BASE_Y - velocity_influence),
+		base_rotation
+	)
+
+func _compute_base_rotation(vel_y: float, dir: float) -> float:
+	if dir == 0:
+		return HAND_ROTATION_DOWN if vel_y < -50 else (HAND_ROTATION_UP if vel_y > 50 else HAND_ROTATION_UP)
+	if dir > 0:
+		return HAND_ROTATION_UP_RIGHT if vel_y < -50 else HAND_ROTATION_DOWN_RIGHT
+	return HAND_ROTATION_UP_LEFT if vel_y < -50 else HAND_ROTATION_DOWN_LEFT
+
+func _compute_apex_rotation(vel_y: float, dir: float) -> float:
+	if dir == 0:
+		return HAND_ROTATION_DOWN if vel_y < 0 else HAND_ROTATION_UP
+	if dir > 0:
+		return HAND_ROTATION_UP_RIGHT if vel_y < 0 else HAND_ROTATION_DOWN_RIGHT
+	return HAND_ROTATION_UP_LEFT if vel_y < 0 else HAND_ROTATION_DOWN_LEFT

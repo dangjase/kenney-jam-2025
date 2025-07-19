@@ -1,10 +1,12 @@
-[gd_scene load_steps=20 format=3 uid="uid://cenioqnrin3u0"]
+[gd_scene load_steps=24 format=3 uid="uid://cenioqnrin3u0"]
 
 [ext_resource type="Script" uid="uid://1ivp1lfu0xe3" path="res://Scripts/player.gd" id="1_6t5aa"]
 [ext_resource type="Texture2D" uid="uid://bbtxgs8ceqf3e" path="res://Assets/shape_characters/PNG/Default/red_body_square.png" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://dokaca4b80l20" path="res://Assets/shape_characters/PNG/Default/face_a.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://bvjkhqhy42fh8" path="res://Assets/shape_characters/PNG/Default/Custom/face_a_look_down.png" id="4_gymyn"]
 [ext_resource type="Texture2D" uid="uid://dcwevl85hfjt3" path="res://Assets/shape_characters/PNG/Default/red_hand_closed.png" id="4_x3wgy"]
 [ext_resource type="Texture2D" uid="uid://j7rooq4limh2" path="res://Assets/shape_characters/PNG/Default/red_hand_open.png" id="5_3smsa"]
+[ext_resource type="Texture2D" uid="uid://btp77pwb76ajy" path="res://Assets/shape_characters/PNG/Default/Custom/face_a_look_up.png" id="5_pu2lt"]
 [ext_resource type="Texture2D" uid="uid://c7a52s7m2n6gn" path="res://Assets/shape_characters/PNG/Default/red_hand_peace.png" id="6_8erm5"]
 [ext_resource type="Texture2D" uid="uid://c6xklip4roajh" path="res://Assets/shape_characters/PNG/Default/red_hand_point.png" id="7_f1ek2"]
 [ext_resource type="Texture2D" uid="uid://dhqjoj62f2ju6" path="res://Assets/shape_characters/PNG/Default/red_hand_rock.png" id="8_tx1dd"]
@@ -17,6 +19,14 @@ size = Vector2(79, 79)
 atlas = ExtResource("2_cvnsp")
 region = Rect2(0, 0, 50, 29)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_h4iuc"]
+atlas = ExtResource("4_gymyn")
+region = Rect2(0, 0, 50, 29)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fd4e3"]
+atlas = ExtResource("5_pu2lt")
+region = Rect2(0, 0, 50, 29)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_vgqql"]
 animations = [{
 "frames": [{
@@ -24,13 +34,24 @@ animations = [{
 "texture": SubResource("AtlasTexture_6t5aa")
 }],
 "loop": false,
-"name": &"default",
+"name": &"face_a",
 "speed": 0.0
 }, {
-"frames": [],
-"loop": true,
-"name": &"new_animation",
-"speed": 5.0
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h4iuc")
+}],
+"loop": false,
+"name": &"face_a_down",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fd4e3")
+}],
+"loop": false,
+"name": &"face_a_up",
+"speed": 0.0
 }]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_f1ek2"]
@@ -123,6 +144,7 @@ texture = ExtResource("1_v0iea")
 [node name="FaceSprite" type="AnimatedSprite2D" parent="."]
 z_index = 3
 sprite_frames = SubResource("SpriteFrames_vgqql")
+animation = &"face_a"
 
 [node name="HandRight" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_pu2lt")
