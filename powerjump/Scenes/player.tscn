@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://cenioqnrin3u0"]
+[gd_scene load_steps=25 format=3 uid="uid://cenioqnrin3u0"]
 
 [ext_resource type="Script" uid="uid://1ivp1lfu0xe3" path="res://Scripts/player.gd" id="1_6t5aa"]
 [ext_resource type="Texture2D" uid="uid://bbtxgs8ceqf3e" path="res://Assets/shape_characters/PNG/Default/red_body_square.png" id="1_v0iea"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://c6xklip4roajh" path="res://Assets/shape_characters/PNG/Default/red_hand_point.png" id="7_f1ek2"]
 [ext_resource type="Texture2D" uid="uid://dhqjoj62f2ju6" path="res://Assets/shape_characters/PNG/Default/red_hand_rock.png" id="8_tx1dd"]
 [ext_resource type="Texture2D" uid="uid://b0qebgchkt1qx" path="res://Assets/shape_characters/PNG/Default/red_hand_thumb.png" id="9_gymyn"]
+[ext_resource type="AudioStream" uid="uid://goue2mimywh3" path="res://Assets/impactGlass_heavy_002.ogg" id="12_pu2lt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f60y1"]
 size = Vector2(79, 79)
@@ -160,3 +161,6 @@ animation = &"closed"
 sprite_frames = SubResource("SpriteFrames_pu2lt")
 animation = &"open"
 flip_h = true
+
+[node name="BoingPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_pu2lt")

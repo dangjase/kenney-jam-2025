@@ -131,7 +131,8 @@ func handle_physics(delta) -> void:
 					velocity.y += fall_gravity * delta
 				if (is_on_wall()): #Bounce off wall
 					velocity.x = -1 * last_velocity.x * WALL_BOUNCE_DAMPENING
-
+					print('aaa')
+					$BoingPlayer.play()
 					# Update direction_input to match the new velocity direction
 					#NOTE: the player did not actually change input, but we use this to calculate the hand animation
 					direction_input = sign(velocity.x) 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqfqdvcgrccoh"
-path="res://.godot/imported/set3_background.png-8e43fa3140d6d96e2b037d44a309d86f.ctex"
+uid="uid://cryq51i726fbk"
+path="res://.godot/imported/backgroundComb.png-f093b196baad5e89f64d2314066346d5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/kenney_abstract-platformer/PNG/Backgrounds/set3_background.png"
-dest_files=["res://.godot/imported/set3_background.png-8e43fa3140d6d96e2b037d44a309d86f.ctex"]
+source_file="res://Assets/kenney_abstract-platformer/backgroundComb.png"
+dest_files=["res://.godot/imported/backgroundComb.png-f093b196baad5e89f64d2314066346d5.ctex"]
 
 [params]
 
