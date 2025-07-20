@@ -237,7 +237,7 @@ autostart = true
 
 [node name="LaughPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("15_h4iuc")
-volume_db = -25.124
+volume_db = 20.064
 
 [node name="BoingPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("12_fd4e3")

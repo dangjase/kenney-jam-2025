@@ -64,7 +64,6 @@ enum states {
 	CHARGING,
 	LAUNCH,
 	AIRBORNE,
-	DEBUGFLY,
 	WALKING
 }
 
@@ -115,8 +114,6 @@ func handle_input(delta) -> void:
 			pass
 		states.AIRBORNE:
 			direction_input = Input.get_axis("move_left", "move_right")
-		states.DEBUGFLY:
-			pass
 		states.WALKING:
 			direction_input = Input.get_axis("move_left", "move_right")
 			if abs(direction_input) == 0:
@@ -126,11 +123,6 @@ func handle_input(delta) -> void:
 				change_player_state(states.CHARGING)
 			elif !is_on_floor():
 				change_player_state(states.AIRBORNE)
-	if Input.is_action_just_pressed("noclip"):
-		if player_state == states.DEBUGFLY:
-			change_player_state(states.AIRBORNE)
-		else:
-			player_state = states.DEBUGFLY
 
 func handle_physics(delta) -> void:
 	match player_state:
@@ -173,8 +165,6 @@ func handle_physics(delta) -> void:
 				
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
-		states.DEBUGFLY:
-			set_velocity(debug_input_vector() * 5000)
 		states.WALKING:
 			if !is_on_floor():
 				change_player_state(states.AIRBORNE)

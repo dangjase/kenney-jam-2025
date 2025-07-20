@@ -483,31 +483,31 @@ horizontal_alignment = 1
 
 [node name="Song1" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("12_brsak")
-volume_db = -34.0
+volume_db = -31.0
 
 [node name="Song2" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("13_38inv")
-volume_db = -34.0
+volume_db = -31.0
 
 [node name="Song3" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("14_gue2s")
-volume_db = -34.0
+volume_db = -31.0
 
 [node name="Song4" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("15_4kgl3")
-volume_db = -34.0
+volume_db = -31.0
 
 [node name="Song5" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_g5fb1")
-volume_db = -34.0
+volume_db = -31.0
 
 [node name="Song6" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("17_1ux1g")
-volume_db = -34.0
+volume_db = -31.0
 
 [node name="Song7" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("18_vggy3")
-volume_db = -34.0
+volume_db = -31.0
 
 [connection signal="body_entered" from="YellowCrystal/Area2D" to="YellowCrystal/Area2D" method="_on_body_entered"]
 [connection signal="body_entered" from="Camera_Transition_Areas/Area" to="Camera_Transition_Areas/Area" method="_on_body_entered"]
