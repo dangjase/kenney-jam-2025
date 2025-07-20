@@ -14,7 +14,6 @@ z_as_relative = false
 emitting = false
 amount = 50
 lifetime = 0.45
-one_shot = true
 speed_scale = 3.32
 explosiveness = 1.0
 emission_shape = 4
