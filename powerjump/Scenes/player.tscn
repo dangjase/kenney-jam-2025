@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://cenioqnrin3u0"]
+[gd_scene load_steps=27 format=3 uid="uid://cenioqnrin3u0"]
 
 [ext_resource type="Script" uid="uid://1ivp1lfu0xe3" path="res://Scripts/player.gd" id="1_6t5aa"]
 [ext_resource type="Texture2D" uid="uid://bbtxgs8ceqf3e" path="res://Assets/shape_characters/PNG/Default/red_body_square.png" id="1_v0iea"]
@@ -132,11 +132,6 @@ animations = [{
 "speed": 1.0
 }]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7dp3o"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h4iuc"]
-bg_color = Color(0.679769, 1, 0.20516, 1)
-
 [node name="Player" type="CharacterBody2D"]
 collision_mask = 3
 floor_stop_on_slope = false
@@ -179,21 +174,3 @@ stream = ExtResource("13_ukyrk")
 
 [node name="ShoutPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("14_7dp3o")
-
-[node name="ProgressBar" type="ProgressBar" parent="."]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -40.0
-offset_top = -60.0
-offset_right = 40.0
-offset_bottom = -50.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_7dp3o")
-theme_override_styles/fill = SubResource("StyleBoxFlat_h4iuc")
-value = 50.0
-show_percentage = false

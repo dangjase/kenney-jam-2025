@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=4 uid="uid://dnd8h0mf3buwc"]
+[gd_scene load_steps=14 format=4 uid="uid://dnd8h0mf3buwc"]
 
 [ext_resource type="PackedScene" uid="uid://cenioqnrin3u0" path="res://Scenes/player.tscn" id="1_8yv6y"]
 [ext_resource type="Texture2D" uid="uid://bcmiw5q4xktbp" path="res://Assets/kenney_abstract-platformer/PNG/Backgrounds/set2_background.png" id="2_4n8kr"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dewicdj5vmpu1" path="res://Assets/3D/tree-pine-large.glb" id="5_g5i3w"]
 [ext_resource type="PackedScene" uid="uid://d0jcs0rkgku0" path="res://Assets/3D/grass.glb" id="7_jpd6o"]
 [ext_resource type="MeshLibrary" uid="uid://mrogdprd4n2v" path="res://Scenes/tiles.tres" id="8_b7yf3"]
+[ext_resource type="PackedScene" uid="uid://b2oihy0it3xvw" path="res://Scenes/hud.tscn" id="11_sijo3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3ypgb"]
 texture = ExtResource("3_lo75r")
@@ -384,3 +385,5 @@ metadata/_editor_floor_ = Vector3(0, 15, 0)
 [node name="Level2Background" type="Sprite2D" parent="."]
 position = Vector2(168, -2927)
 texture = ExtResource("4_3ypgb")
+
+[node name="HUD" parent="." instance=ExtResource("11_sijo3")]

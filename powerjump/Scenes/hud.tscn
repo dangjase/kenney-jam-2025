@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=3 uid="uid://b2oihy0it3xvw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uq4kh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sijo3"]
+bg_color = Color(0.679769, 1, 0.20516, 1)
+
+[node name="HUD" type="CanvasLayer"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ProgressBar" type="ProgressBar" parent="Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/background = SubResource("StyleBoxFlat_uq4kh")
+theme_override_styles/fill = SubResource("StyleBoxFlat_sijo3")
+value = 50.0
+show_percentage = false
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Control/ProgressBar"]
+layout_mode = 0
+offset_top = -50.275
+offset_right = 400.0
+offset_bottom = 9.725
+theme_override_colors/font_selected_color = Color(0.488287, 0.00153903, 0.688602, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 40
+text = "POWER"
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 2
+visible_characters_behavior = 1
