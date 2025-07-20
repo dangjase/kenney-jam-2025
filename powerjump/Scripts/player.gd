@@ -1,17 +1,15 @@
 extends CharacterBody2D
 
-const DEFAULT_FALL_GRAVITY: float = 2500
-const DEFAULT_RISE_GRAVITY: float = 2500
-const JUMP_VELOCITY_MULTIPLIER: float = -1200
-const MAX_JUMP_HOLD_TIME: float = 1.7
-const HORIZONTAL_SPEED: float = 800
-const MAX_FALL_SPEED: float = 1800
-const MIN_JUMP_HOLD_TIME: float = 0.125
+const DEFAULT_FALL_GRAVITY: float = 3800  # Was 2500 - Much faster fall
+const DEFAULT_RISE_GRAVITY: float = 3000  # Was 2500 - Moderately faster rise
+const JUMP_VELOCITY_MULTIPLIER: float = -2267  # Unchanged - keeps same max height
+const MAX_JUMP_HOLD_TIME: float = 0.9  # Unchanged - keeps same charge time
+const HORIZONTAL_SPEED: float = 1000  # Was 800 - Increased to match faster vertical movement
+const MAX_FALL_SPEED: float = 2400  # Was 1800 - Increased to allow faster falling
+const MIN_JUMP_HOLD_TIME: float = 0.05  # Unchanged
 const WALL_BOUNCE_DAMPENING: float = 0.75  # How much speed is kept after a wall bounce
-const SLOPE_RICOCHET_DAMPENING: float = 0.65 # How much speed is kept after a slope ricochet
-const SLOPE_RICOCHET_BOOST: float = 1.1 # Multiplier for upward velocity after ricochet
-const MIN_RICOCHET_SPEED: float = 250 # Minimum falling speed to trigger ricochet
-const MAX_RICOCHET_SPEED: float = 1800 # Maximum speed after ricochet to prevent chaos
+const SLOPE_SLIDE_SPEED: float = 800.0  # Base speed for slope sliding
+const SLOPE_SLIDE_ACCELERATION: float = 2000.0  # How quickly we accelerate down slopes
 
 # Animation constants
 const HAND_WAVE_SPEED: float = 5.0
@@ -152,8 +150,8 @@ func handle_physics(delta) -> void:
 					#NOTE: the player did not actually change input, but we use this to calculate the hand animation
 					direction_input = sign(velocity.x)
 				
-				# Check for slope ricochet (trampoline effect)
-				_check_slope_ricochet()
+				# Check for slope sliding (replacing ricochet)
+				_check_slope_slide()
 				
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
@@ -253,18 +251,18 @@ func _update_airborne_face() -> void:
 	
 	if velocity.y < 0:
 		faceSprite.play('face_a_up')
-		target_y = -20
+		target_y = -17
 	elif velocity.y > 0:
 		faceSprite.play('face_a_down')
-		target_y = 20
+		target_y = 17
 	else:
 		faceSprite.play('face_a')
 		target_y = 0
 		
 	if velocity.x < 0:
-		target_x = -15
+		target_x = -11
 	elif velocity.x > 0:
-		target_x = 15
+		target_x = 11
 	else:
 		target_x = 0
 	
@@ -316,23 +314,17 @@ func _compute_apex_rotation(vel_y: float, dir: float) -> float:
 
 # Slope ricochet functions for trampoline effect
 
-func _check_slope_ricochet() -> void:
-	# Only check when falling with sufficient speed
-	if velocity.y < MIN_RICOCHET_SPEED:
-		return
-	
+func _check_slope_slide() -> void:
 	# Check current collisions for slopes
 	var collision_count = get_slide_collision_count()
 	for i in range(collision_count):
 		var collision = get_slide_collision(i)
-		var collider = collision.get_collider()
-		if collider:
-			var normal = collision.get_normal()
-			
-			# Check if it's a slope (angled surface, not flat ground)
-			if _is_slope_surface(normal):
-				_handle_slope_ricochet(normal, collision.get_position())
-				return
+		var normal = collision.get_normal()
+		
+		# Check if it's a slope (angled surface, not flat ground)
+		if _is_slope_surface(normal):
+			_handle_slope_slide(normal)
+			return
 
 func _is_slope_surface(normal: Vector2) -> bool:
 	# A slope has significant horizontal component and isn't too steep
@@ -342,42 +334,21 @@ func _is_slope_surface(normal: Vector2) -> bool:
 	# Must have some angle (not flat) but not too steep (still walkable-ish)
 	return horizontal_component > 0.3 and vertical_component > 0.2
 
-func _handle_slope_ricochet(normal: Vector2, collision_point: Vector2) -> void:
-	print("Slope trampoline! Normal: ", normal, " Speed: ", velocity.length())
+func _handle_slope_slide(normal: Vector2) -> void:
+	# Calculate the slope's angle and direction
+	var slope_angle = rad_to_deg(acos(normal.dot(Vector2.UP)))
+	var slope_direction = -sign(normal.x)  # Negative because we want to slide down
 	
-	# Calculate the angle of the slope
-	var slope_angle = normal.angle_to(Vector2.UP)
+	# Calculate slide acceleration based on slope angle
+	var slide_factor = sin(deg_to_rad(slope_angle))
+	var slide_acceleration = SLOPE_SLIDE_ACCELERATION * slide_factor * slope_direction
 	
-	# Ensure normal points away from the slope surface
-	if normal.y > 0:
-		normal = -normal
+	# Apply acceleration along the slope
+	velocity.x += slide_acceleration * get_physics_process_delta_time()
 	
-	# Perfect reflection using the slope normal
-	var reflected_velocity = velocity.bounce(normal)
+	# Clamp to max slide speed (scaled by slope angle)
+	var max_speed = SLOPE_SLIDE_SPEED * slide_factor
+	velocity.x = clamp(velocity.x, -max_speed, max_speed)
 	
-	# Apply trampoline boost based on impact speed and slope angle
-	var impact_speed = velocity.length()
-	var speed_factor = min(impact_speed / 1200.0, 1.5)  # Reduced max boost to 1.5x
-	var angle_factor = 1.0 + abs(slope_angle) * 0.3  # Reduced angle influence
-	
-	# Apply the ricochet with boost
-	velocity = reflected_velocity * SLOPE_RICOCHET_DAMPENING * speed_factor
-	
-	# Add extra upward boost for trampoline effect
-	if velocity.y < 0:
-		velocity.y *= SLOPE_RICOCHET_BOOST * angle_factor
-	
-	# Add some horizontal push based on slope direction for dynamic bounces
-	var slope_direction = sign(normal.x)
-	velocity.x += slope_direction * 75 * speed_factor  # Reduced horizontal push
-	
-	# Cap the total speed to prevent runaway velocity
-	var total_speed = velocity.length()
-	if total_speed > MAX_RICOCHET_SPEED:
-		velocity = velocity.normalized() * MAX_RICOCHET_SPEED
-		print("Speed capped at: ", MAX_RICOCHET_SPEED)
-	
-	# Update animation direction
-	direction_input = sign(velocity.x)
-	
-	print("Ricochet result: ", velocity, " Total speed: ", velocity.length())
+	# Keep vertical velocity minimal while on slope
+	velocity.y = min(velocity.y, 50)  # Small positive value to keep contact
