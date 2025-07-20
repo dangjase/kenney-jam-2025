@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cenioqnrin3u0"]
+[gd_scene load_steps=27 format=3 uid="uid://cenioqnrin3u0"]
 
 [ext_resource type="Script" uid="uid://1ivp1lfu0xe3" path="res://Scripts/player.gd" id="1_6t5aa"]
 [ext_resource type="Texture2D" uid="uid://bbtxgs8ceqf3e" path="res://Assets/shape_characters/PNG/Default/red_body_square.png" id="1_v0iea"]
@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://dhqjoj62f2ju6" path="res://Assets/shape_characters/PNG/Default/red_hand_rock.png" id="8_tx1dd"]
 [ext_resource type="Texture2D" uid="uid://b0qebgchkt1qx" path="res://Assets/shape_characters/PNG/Default/red_hand_thumb.png" id="9_gymyn"]
 [ext_resource type="AudioStream" uid="uid://goue2mimywh3" path="res://Assets/impactGlass_heavy_002.ogg" id="12_pu2lt"]
+[ext_resource type="AudioStream" uid="uid://c3xv6ohgioex3" path="res://Assets/charging.mp3" id="13_ukyrk"]
+[ext_resource type="AudioStream" uid="uid://bofyq7ttj3tte" path="res://Assets/uwaaa.mp3" id="14_7dp3o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f60y1"]
 size = Vector2(79, 79)
@@ -167,3 +169,9 @@ flip_h = true
 
 [node name="BoingPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("12_pu2lt")
+
+[node name="ChargingPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_ukyrk")
+
+[node name="ShoutPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_7dp3o")

@@ -37,6 +37,7 @@ const HAND_ROTATION_DOWN_LEFT: float = 45    # Pointing up-right when moving dow
 @onready var faceSprite = $FaceSprite
 @onready var handRightSprite = $HandRight
 @onready var handLeftSprite = $HandLeft
+@onready var progressbar = get_parent().get_node("HUD/Control/ProgressBar")
 
 #properties
 var player_state: states
@@ -56,6 +57,7 @@ enum states {
 }
 
 func _ready() -> void:
+	get_tree().current_scene.print_tree_pretty()
 	player_state = states.AIRBORNE
 	faceSprite.play('default')
 	fall_gravity = DEFAULT_FALL_GRAVITY
@@ -101,7 +103,10 @@ func handle_input(delta) -> void:
 		states.DEBUGFLY:
 			pass
 	if Input.is_action_just_pressed("noclip"):
-		player_state = states.DEBUGFLY
+		if player_state == states.DEBUGFLY:
+			change_player_state(states.AIRBORNE)
+		else:
+			player_state = states.DEBUGFLY
 
 func handle_physics(delta) -> void:
 	match player_state:
@@ -154,6 +159,8 @@ func change_player_state(new_state) -> void:
 	player_state = new_state
 	match player_state:
 		states.GROUNDED:
+			progressbar.visible = false
+			$ChargingPlayer.stop()
 			handRightSprite.play('closed')
 			handLeftSprite.play('closed')
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
@@ -162,11 +169,16 @@ func change_player_state(new_state) -> void:
 			faceSprite.position.y = 0
 			faceSprite.position.x = 0
 		states.CHARGING:
+			progressbar.visible = true
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
 			handLeftSprite.rotation_degrees = HAND_ROTATION_UP
+			$ChargingPlayer.play()
 		states.LAUNCH:
+			progressbar.visible = false
+			$ChargingPlayer.stop()
+			$ShoutPlayer.play()
 			handRightSprite.play('closed')
 			handLeftSprite.play('closed')
 			handRightSprite.rotation_degrees = HAND_ROTATION_DOWN
@@ -196,6 +208,7 @@ func handle_animation(delta) -> void:
 				Vector2( HAND_OFFSET_X - wave * 0.3, height - wave),
 				HAND_ROTATION_UP
 			)
+			progressbar.value = charge_progress * 100
 
 		states.LAUNCH:
 			var y_offset = -HAND_WAVE_AMPLITUDE * 2
