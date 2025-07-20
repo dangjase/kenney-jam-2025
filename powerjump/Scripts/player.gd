@@ -6,7 +6,7 @@ const JUMP_VELOCITY_MULTIPLIER: float = -2267  # Unchanged - keeps same max heig
 const MAX_JUMP_HOLD_TIME: float = 0.9  # Unchanged - keeps same charge time
 const HORIZONTAL_SPEED: float = 1000  # Was 800 - Increased to match faster vertical movement
 const MAX_FALL_SPEED: float = 2400  # Was 1800 - Increased to allow faster falling
-const MIN_JUMP_HOLD_TIME: float = 0.05  # Unchanged
+const MIN_JUMP_HOLD_TIME: float = 0.08  # Unchanged
 const WALL_BOUNCE_DAMPENING: float = 0.75  # How much speed is kept after a wall bounce
 const SLOPE_SPEED: float = 1200.0  # How fast we move along slopes
 
@@ -47,6 +47,7 @@ const HAND_ROTATION_DOWN_LEFT: float = 45    # Pointing up-right when moving dow
 @onready var chargingSound = $ChargingPlayer
 @onready var landSound = $LandPlayer
 @onready var laughSound = $LaughPlayer
+@onready var launchParticles = $LaunchParticles
 
 #properties
 var player_state: states
@@ -220,6 +221,9 @@ func change_player_state(new_state) -> void:
 			handRightSprite.rotation_degrees = HAND_ROTATION_DOWN
 			handLeftSprite.rotation_degrees = HAND_ROTATION_DOWN
 			faceSprite.position.y = lerp(float(faceSprite.position.y), 0.0, 0.5)
+			launchParticles.position.x = (handRightSprite.position.x + handLeftSprite.position.x) / 2
+			launchParticles.position.y = 45
+			launchParticles.emitting = true
 		states.AIRBORNE:
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
@@ -277,6 +281,8 @@ func handle_animation(delta) -> void:
 				Vector2( HAND_OFFSET_X,  y_offset),
 				HAND_ROTATION_DOWN
 			)
+			launchParticles.position.x = max(handRightSprite.position.x, handLeftSprite.position.x)
+			launchParticles.emitting = true
 
 		states.AIRBORNE:
 			_update_airborne_hands()

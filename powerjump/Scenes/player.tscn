@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://cenioqnrin3u0"]
+[gd_scene load_steps=39 format=3 uid="uid://cenioqnrin3u0"]
 
 [ext_resource type="Script" uid="uid://1ivp1lfu0xe3" path="res://Scripts/player.gd" id="1_6t5aa"]
 [ext_resource type="Texture2D" uid="uid://bbtxgs8ceqf3e" path="res://Assets/shape_characters/PNG/Default/red_body_square.png" id="1_v0iea"]
@@ -21,6 +21,7 @@
 [ext_resource type="AudioStream" uid="uid://ccxpxxetwf1jy" path="res://Assets/laugh.ogg" id="15_h4iuc"]
 [ext_resource type="AudioStream" uid="uid://cc5e4n71qg8jl" path="res://Assets/Sounds/footstep_concrete_001.ogg" id="16_fd4e3"]
 [ext_resource type="AudioStream" uid="uid://c35wtqrrjqjfg" path="res://Assets/Sounds/footstep_grass_001.ogg" id="16_qqcod"]
+[ext_resource type="PackedScene" uid="uid://bihiei6p7o56o" path="res://Scenes/launchParticles.tscn" id="22_wpjfl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f60y1"]
 size = Vector2(79, 79)
@@ -253,3 +254,6 @@ volume_db = -24.539
 [node name="LandPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_fd4e3")
 volume_db = -29.213
+
+[node name="LaunchParticles" parent="." instance=ExtResource("22_wpjfl")]
+scale = Vector2(0.28, 0.28)
