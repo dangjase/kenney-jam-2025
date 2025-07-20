@@ -8,8 +8,14 @@ const HORIZONTAL_SPEED: float = 1000  # Was 800 - Increased to match faster vert
 const MAX_FALL_SPEED: float = 2400  # Was 1800 - Increased to allow faster falling
 const MIN_JUMP_HOLD_TIME: float = 0.05  # Unchanged
 const WALL_BOUNCE_DAMPENING: float = 0.75  # How much speed is kept after a wall bounce
-const SLOPE_SLIDE_SPEED: float = 800.0  # Base speed for slope sliding
-const SLOPE_SLIDE_ACCELERATION: float = 2000.0  # How quickly we accelerate down slopes
+const SLOPE_SPEED: float = 1200.0  # How fast we move along slopes
+
+# Walking constants
+const WALK_SPEED: float = 600.0  # Walking speed on ground
+const WALK_HAND_Y: float = 24.0  # Vertical position of hands while walking
+const WALK_HAND_AMPLITUDE: float = 40.0  # How far hands move forward/back
+const WALK_HAND_SPEED: float = 12.0  # Speed of walking animation
+const WALK_HAND_BOUNCE: float = 5.0  # Vertical bounce while walking
 
 # Animation constants
 const HAND_WAVE_SPEED: float = 5.0
@@ -36,7 +42,6 @@ const HAND_ROTATION_DOWN_LEFT: float = 45    # Pointing up-right when moving dow
 @onready var handRightSprite = $HandRight
 @onready var handLeftSprite = $HandLeft
 @onready var progressbar = get_parent().get_node("HUD/Control/ProgressBar")
-@onready var falltimer = $FallTimer
 @onready var jumpSound = $JumpPlayer
 @onready var boingSound = $BoingPlayer
 @onready var chargingSound = $ChargingPlayer
@@ -58,7 +63,8 @@ enum states {
 	CHARGING,
 	LAUNCH,
 	AIRBORNE,
-	DEBUGFLY
+	DEBUGFLY,
+	WALKING
 }
 
 func _ready() -> void:
@@ -87,9 +93,12 @@ func debug_input_vector():
 func handle_input(delta) -> void:
 	match player_state:
 		states.GROUNDED:
+			direction_input = Input.get_axis("move_left", "move_right")
 			if Input.is_action_pressed("jump"):
 				jump_hold_time = 0;
 				change_player_state(states.CHARGING);
+			elif abs(direction_input) > 0:
+				change_player_state(states.WALKING)
 		states.CHARGING:
 			jump_hold_time += delta;
 			if jump_hold_time >= MAX_JUMP_HOLD_TIME:
@@ -104,9 +113,18 @@ func handle_input(delta) -> void:
 		states.LAUNCH:
 			pass
 		states.AIRBORNE:
-			pass	
+			direction_input = Input.get_axis("move_left", "move_right")
 		states.DEBUGFLY:
 			pass
+		states.WALKING:
+			direction_input = Input.get_axis("move_left", "move_right")
+			if abs(direction_input) == 0:
+				change_player_state(states.GROUNDED)
+			elif Input.is_action_pressed("jump"):
+				jump_hold_time = 0
+				change_player_state(states.CHARGING)
+			elif !is_on_floor():
+				change_player_state(states.AIRBORNE)
 	if Input.is_action_just_pressed("noclip"):
 		if player_state == states.DEBUGFLY:
 			change_player_state(states.AIRBORNE)
@@ -147,16 +165,21 @@ func handle_physics(delta) -> void:
 					velocity.x = -1 * last_velocity.x * WALL_BOUNCE_DAMPENING
 					boingSound.play()
 					# Update direction_input to match the new velocity direction
-					#NOTE: the player did not actually change input, but we use this to calculate the hand animation
 					direction_input = sign(velocity.x)
 				
-				# Check for slope sliding (replacing ricochet)
+				# Check for slope sliding
 				_check_slope_slide()
 				
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
 		states.DEBUGFLY:
 			set_velocity(debug_input_vector() * 5000)
+		states.WALKING:
+			if !is_on_floor():
+				change_player_state(states.AIRBORNE)
+			else:
+				velocity.x = direction_input * WALK_SPEED
+				velocity.y = 0  # Keep us on the ground
 
 func change_player_state(new_state) -> void:
 	# save old state here for transition logic
@@ -171,21 +194,22 @@ func change_player_state(new_state) -> void:
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
 			handLeftSprite.rotation_degrees = HAND_ROTATION_UP
 			faceSprite.play('face_a')
-			landSound.play()
 			faceSprite.position.y = 0
 			faceSprite.position.x = 0
-			print(jump_start_y, " | ", global_position.y)
-			if (old_state == states.AIRBORNE 
-				and falltimer.is_stopped() 
-				and global_position.y > jump_start_y + 800):
-				laughSound.play()
+			velocity.x = 0  # Stop horizontal movement
+			if (old_state == states.AIRBORNE):
+				landSound.play()
 		states.CHARGING:
 			progressbar.visible = true
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
+			faceSprite.play('face_g')
+			faceSprite.position.y = 0
+			faceSprite.position.x = 0
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
 			handLeftSprite.rotation_degrees = HAND_ROTATION_UP
 			chargingSound.play()
+			velocity.x = 0  # Stop horizontal movement
 		states.LAUNCH:
 			progressbar.visible = false
 			chargingSound.stop()
@@ -195,10 +219,18 @@ func change_player_state(new_state) -> void:
 			handLeftSprite.play('closed')
 			handRightSprite.rotation_degrees = HAND_ROTATION_DOWN
 			handLeftSprite.rotation_degrees = HAND_ROTATION_DOWN
+			faceSprite.position.y = lerp(float(faceSprite.position.y), 0.0, 0.5)
 		states.AIRBORNE:
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
-			falltimer.start()
+		states.WALKING:
+			handRightSprite.play('open')
+			handLeftSprite.play('open')
+			faceSprite.play('face_a')
+			if (old_state == states.AIRBORNE):
+				landSound.play()
+			faceSprite.position.y = 0
+			faceSprite.position.x = 0
 
 func handle_animation(delta) -> void:
 	animation_time += delta
@@ -222,6 +254,21 @@ func handle_animation(delta) -> void:
 				HAND_ROTATION_UP
 			)
 			progressbar.value = charge_progress * 100
+			
+			# Lerp face upwards during charge
+			var target_y = 17
+			faceSprite.position.y = lerp(float(faceSprite.position.y), float(target_y), 0.035)
+			
+			# Lerp face horizontally based on input direction
+			direction_input = Input.get_axis("move_left", "move_right")
+			var target_x = direction_input * 9
+			faceSprite.position.x = lerp(float(faceSprite.position.x), float(target_x), 0.3)
+			
+			# Update face animation based on charge progress
+			if charge_progress >= 0.6:  # 60% charged
+				faceSprite.play('face_g')
+			else:
+				faceSprite.play('face_f')
 
 		states.LAUNCH:
 			var y_offset = -HAND_WAVE_AMPLITUDE * 2
@@ -234,6 +281,44 @@ func handle_animation(delta) -> void:
 		states.AIRBORNE:
 			_update_airborne_hands()
 			_update_airborne_face()
+		states.WALKING:
+			var walk_wave = sin(animation_time * WALK_HAND_SPEED)
+			var left_offset = walk_wave * WALK_HAND_AMPLITUDE
+			var right_offset = -walk_wave * WALK_HAND_AMPLITUDE  # Opposite phase
+			
+			# Add vertical bounce synchronized with horizontal movement
+			var bounce = abs(walk_wave) * WALK_HAND_BOUNCE
+			
+			# Update hand sprites based on their movement direction
+			if walk_wave > 0:
+				handLeftSprite.play('open')
+				handRightSprite.play('closed')
+			else:
+				handLeftSprite.play('closed')
+				handRightSprite.play('open')
+			
+			# Determine hand rotation based on movement direction
+			var hand_rotation = HAND_ROTATION_UP
+			if direction_input > 0:
+				hand_rotation = HAND_ROTATION_UP_LEFT
+			elif direction_input < 0:
+				hand_rotation = HAND_ROTATION_UP_RIGHT
+			
+			_set_hand_pose(
+				Vector2(-HAND_OFFSET_X + left_offset, WALK_HAND_Y - bounce),
+				Vector2(HAND_OFFSET_X + right_offset, WALK_HAND_Y - bounce),
+				hand_rotation
+			)
+			
+			# Update face direction
+			var target_x = direction_input * 9
+			if (target_x > 0):
+				faceSprite.play('face_a_right')
+			elif (target_x < 0):
+				faceSprite.play('face_a_left')
+			else:
+				faceSprite.play('face_a')
+			faceSprite.position.x = lerp(float(faceSprite.position.x), float(target_x), 0.15)
 
 
 # Helper functions for animation
@@ -271,7 +356,8 @@ func _update_airborne_face() -> void:
 	faceSprite.position.x = lerp(float(faceSprite.position.x), float(target_x), 0.15)
 
 func _update_airborne_hands() -> void:
-	var wave_speed = 24.0 if direction_input != 0 else 12.0
+	var movement_direction = sign(velocity.x)  # Use velocity direction instead of input
+	var wave_speed = 24.0 if movement_direction != 0 else 12.0
 	var air_wave   = sin(animation_time * wave_speed) * 15.0
 
 	# Vertical influence (hands move depending on fall/rise speed)
@@ -282,20 +368,20 @@ func _update_airborne_hands() -> void:
 
 	# Horizontal influence / spread
 	var vertical_scale   = 1.0 + abs(velocity_influence) / velocity_scale * HAND_MOVEMENT_SCALE
-	var movement_offset  = -direction_input * HAND_MOVEMENT_OFFSET * vertical_scale
-	var base_spread      = HAND_AIR_OFFSET_X if direction_input == 0 else HAND_AIR_OFFSET_X - abs(direction_input) * 35.0
+	var movement_offset  = -movement_direction * HAND_MOVEMENT_OFFSET * vertical_scale
+	var base_spread      = HAND_AIR_OFFSET_X if movement_direction == 0 else HAND_AIR_OFFSET_X - abs(movement_direction) * 35.0
 
 	# Determine rotation and smooth it near the apex
-	var base_rotation = _compute_base_rotation(velocity.y, direction_input)
+	var base_rotation = _compute_base_rotation(velocity.y, movement_direction)
 	if abs(velocity.y) < 100:
 		var t = clamp((abs(velocity.y) - 50.0) / 50.0, 0.0, 1.0)
-		var apex_rotation = _compute_apex_rotation(velocity.y, direction_input)
+		var apex_rotation = _compute_apex_rotation(velocity.y, movement_direction)
 		base_rotation = lerp(apex_rotation, base_rotation, t)
 
 	_set_hand_pose(
 		Vector2(-base_spread + air_wave + movement_offset, HAND_BASE_Y - velocity_influence),
 		Vector2( base_spread - air_wave + movement_offset, HAND_BASE_Y - velocity_influence),
-					base_rotation
+		base_rotation
 	)
 
 func _compute_base_rotation(vel_y: float, dir: float) -> float:
@@ -315,40 +401,31 @@ func _compute_apex_rotation(vel_y: float, dir: float) -> float:
 # Slope ricochet functions for trampoline effect
 
 func _check_slope_slide() -> void:
-	# Check current collisions for slopes
-	var collision_count = get_slide_collision_count()
-	for i in range(collision_count):
-		var collision = get_slide_collision(i)
-		var normal = collision.get_normal()
+	if not is_on_floor():
+		return
 		
-		# Check if it's a slope (angled surface, not flat ground)
+	var collision = get_last_slide_collision()
+	if collision:
+		var normal = collision.get_normal()
 		if _is_slope_surface(normal):
 			_handle_slope_slide(normal)
-			return
 
 func _is_slope_surface(normal: Vector2) -> bool:
-	# A slope has significant horizontal component and isn't too steep
-	var horizontal_component = abs(normal.x)
-	var vertical_component = abs(normal.y)
-	
-	# Must have some angle (not flat) but not too steep (still walkable-ish)
-	return horizontal_component > 0.3 and vertical_component > 0.2
+	return abs(normal.x) > 0.1  # Any non-flat surface counts as slope
 
 func _handle_slope_slide(normal: Vector2) -> void:
-	# Calculate the slope's angle and direction
-	var slope_angle = rad_to_deg(acos(normal.dot(Vector2.UP)))
-	var slope_direction = -sign(normal.x)  # Negative because we want to slide down
+	# Get slope direction (tangent to the surface)
+	var slope_direction = Vector2(-normal.y, normal.x)
 	
-	# Calculate slide acceleration based on slope angle
-	var slide_factor = sin(deg_to_rad(slope_angle))
-	var slide_acceleration = SLOPE_SLIDE_ACCELERATION * slide_factor * slope_direction
+	# Make sure we're sliding downhill
+	if slope_direction.y < 0:
+		slope_direction = -slope_direction
 	
-	# Apply acceleration along the slope
-	velocity.x += slide_acceleration * get_physics_process_delta_time()
+	# Project current velocity onto slope direction
+	var current_speed = velocity.project(slope_direction).length()
 	
-	# Clamp to max slide speed (scaled by slope angle)
-	var max_speed = SLOPE_SLIDE_SPEED * slide_factor
-	velocity.x = clamp(velocity.x, -max_speed, max_speed)
+	# Apply movement along slope
+	velocity = slope_direction.normalized() * max(current_speed, SLOPE_SPEED)
 	
-	# Keep vertical velocity minimal while on slope
-	velocity.y = min(velocity.y, 50)  # Small positive value to keep contact
+	# Update animation direction based on horizontal movement
+	direction_input = sign(velocity.x)

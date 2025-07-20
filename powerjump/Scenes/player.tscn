@@ -1,14 +1,18 @@
-[gd_scene load_steps=30 format=3 uid="uid://cenioqnrin3u0"]
+[gd_scene load_steps=38 format=3 uid="uid://cenioqnrin3u0"]
 
 [ext_resource type="Script" uid="uid://1ivp1lfu0xe3" path="res://Scripts/player.gd" id="1_6t5aa"]
 [ext_resource type="Texture2D" uid="uid://bbtxgs8ceqf3e" path="res://Assets/shape_characters/PNG/Default/red_body_square.png" id="1_v0iea"]
-[ext_resource type="Texture2D" uid="uid://dokaca4b80l20" path="res://Assets/shape_characters/PNG/Default/face_a.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://nw2ycyklt1sq" path="res://Assets/shape_characters/PNG/Default/Custom/face_a.png" id="3_fs7ks"]
+[ext_resource type="Texture2D" uid="uid://ctdwbirlftns" path="res://Assets/shape_characters/PNG/Default/face_g.png" id="3_l6n3p"]
 [ext_resource type="Texture2D" uid="uid://bvjkhqhy42fh8" path="res://Assets/shape_characters/PNG/Default/Custom/face_a_look_down.png" id="4_gymyn"]
 [ext_resource type="Texture2D" uid="uid://dcwevl85hfjt3" path="res://Assets/shape_characters/PNG/Default/red_hand_closed.png" id="4_x3wgy"]
 [ext_resource type="Texture2D" uid="uid://j7rooq4limh2" path="res://Assets/shape_characters/PNG/Default/red_hand_open.png" id="5_3smsa"]
+[ext_resource type="Texture2D" uid="uid://bjum8skw324xi" path="res://Assets/shape_characters/PNG/Default/Custom/face_a_look_left.png" id="5_l6n3p"]
 [ext_resource type="Texture2D" uid="uid://btp77pwb76ajy" path="res://Assets/shape_characters/PNG/Default/Custom/face_a_look_up.png" id="5_pu2lt"]
 [ext_resource type="Texture2D" uid="uid://c7a52s7m2n6gn" path="res://Assets/shape_characters/PNG/Default/red_hand_peace.png" id="6_8erm5"]
+[ext_resource type="Texture2D" uid="uid://bh2u7d7apvgab" path="res://Assets/shape_characters/PNG/Default/Custom/face_a_look_right.png" id="6_olqyp"]
 [ext_resource type="Texture2D" uid="uid://c6xklip4roajh" path="res://Assets/shape_characters/PNG/Default/red_hand_point.png" id="7_f1ek2"]
+[ext_resource type="Texture2D" uid="uid://d4bv41nxrjy72" path="res://Assets/shape_characters/PNG/Default/face_f.png" id="8_olqyp"]
 [ext_resource type="Texture2D" uid="uid://dhqjoj62f2ju6" path="res://Assets/shape_characters/PNG/Default/red_hand_rock.png" id="8_tx1dd"]
 [ext_resource type="Texture2D" uid="uid://b0qebgchkt1qx" path="res://Assets/shape_characters/PNG/Default/red_hand_thumb.png" id="9_gymyn"]
 [ext_resource type="AudioStream" uid="uid://elwbw054luk1" path="res://Assets/Sounds/impactWood_heavy_001.ogg" id="12_fd4e3"]
@@ -21,23 +25,39 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f60y1"]
 size = Vector2(79, 79)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_6t5aa"]
-atlas = ExtResource("2_cvnsp")
+[sub_resource type="AtlasTexture" id="AtlasTexture_wpjfl"]
+atlas = ExtResource("3_fs7ks")
 region = Rect2(0, 0, 50, 29)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_h4iuc"]
 atlas = ExtResource("4_gymyn")
 region = Rect2(0, 0, 50, 29)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_bi64h"]
+atlas = ExtResource("5_l6n3p")
+region = Rect2(0, 0, 50, 29)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ijsl"]
+atlas = ExtResource("6_olqyp")
+region = Rect2(0, 0, 50, 29)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_fd4e3"]
 atlas = ExtResource("5_pu2lt")
 region = Rect2(0, 0, 50, 29)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p1odr"]
+atlas = ExtResource("8_olqyp")
+region = Rect2(0, 0, 55, 33)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_olqyp"]
+atlas = ExtResource("3_l6n3p")
+region = Rect2(0, 0, 55, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_vgqql"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_6t5aa")
+"texture": SubResource("AtlasTexture_wpjfl")
 }],
 "loop": false,
 "name": &"face_a",
@@ -53,10 +73,42 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_bi64h")
+}],
+"loop": false,
+"name": &"face_a_left",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ijsl")
+}],
+"loop": false,
+"name": &"face_a_right",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_fd4e3")
 }],
 "loop": false,
 "name": &"face_a_up",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p1odr")
+}],
+"loop": false,
+"name": &"face_f",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_olqyp")
+}],
+"loop": false,
+"name": &"face_g",
 "speed": 0.0
 }]
 
@@ -154,7 +206,7 @@ texture = ExtResource("1_v0iea")
 [node name="FaceSprite" type="AnimatedSprite2D" parent="."]
 z_index = 3
 sprite_frames = SubResource("SpriteFrames_vgqql")
-animation = &"face_a"
+animation = &"face_g"
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.75, 0.75)
@@ -162,10 +214,14 @@ limit_left = -1213
 limit_right = 1345
 
 [node name="HandRight" type="AnimatedSprite2D" parent="."]
+position = Vector2(-79, 0)
+scale = Vector2(1.45, 1.45)
 sprite_frames = SubResource("SpriteFrames_pu2lt")
 animation = &"closed"
 
 [node name="HandLeft" type="AnimatedSprite2D" parent="."]
+position = Vector2(63, 0)
+scale = Vector2(1.45, 1.45)
 sprite_frames = SubResource("SpriteFrames_pu2lt")
 animation = &"open"
 flip_h = true
