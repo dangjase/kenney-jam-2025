@@ -38,6 +38,7 @@ const HAND_ROTATION_DOWN_LEFT: float = 45    # Pointing up-right when moving dow
 @onready var handRightSprite = $HandRight
 @onready var handLeftSprite = $HandLeft
 @onready var progressbar = get_parent().get_node("HUD/Control/ProgressBar")
+@onready var falltimer = $FallTimer
 
 #properties
 var player_state: states
@@ -47,6 +48,7 @@ var rise_gravity: float
 var direction_input: float
 var animation_time: float = 0.0  # Track time for animations
 var last_velocity: Vector2 = Vector2.ZERO # Store velocity from the previous frame
+var jump_start_y: float
 
 enum states {
 	GROUNDED,
@@ -156,6 +158,7 @@ func handle_physics(delta) -> void:
 
 func change_player_state(new_state) -> void:
 	# save old state here for transition logic
+	var old_state = player_state
 	player_state = new_state
 	match player_state:
 		states.GROUNDED:
@@ -168,6 +171,11 @@ func change_player_state(new_state) -> void:
 			faceSprite.play('face_a')
 			faceSprite.position.y = 0
 			faceSprite.position.x = 0
+			print(jump_start_y, " | ", global_position.y)
+			if (old_state == states.AIRBORNE 
+				and falltimer.is_stopped() 
+				and global_position.y > jump_start_y + 800):
+				$LaughPlayer.play()
 		states.CHARGING:
 			progressbar.visible = true
 			handRightSprite.play('open')
@@ -179,6 +187,7 @@ func change_player_state(new_state) -> void:
 			progressbar.visible = false
 			$ChargingPlayer.stop()
 			$ShoutPlayer.play()
+			jump_start_y = global_position.y
 			handRightSprite.play('closed')
 			handLeftSprite.play('closed')
 			handRightSprite.rotation_degrees = HAND_ROTATION_DOWN
@@ -186,6 +195,7 @@ func change_player_state(new_state) -> void:
 		states.AIRBORNE:
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
+			falltimer.start()
 
 func handle_animation(delta) -> void:
 	animation_time += delta
