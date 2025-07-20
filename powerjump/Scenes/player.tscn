@@ -208,7 +208,7 @@ texture = ExtResource("1_v0iea")
 [node name="FaceSprite" type="AnimatedSprite2D" parent="."]
 z_index = 3
 sprite_frames = SubResource("SpriteFrames_vgqql")
-animation = &"face_g"
+animation = &"face_a"
 
 [node name="HandRight" type="AnimatedSprite2D" parent="."]
 position = Vector2(-79, 0)

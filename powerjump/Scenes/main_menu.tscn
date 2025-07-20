@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://bj3ab24b2uhsj"]
+
+[ext_resource type="Script" uid="uid://clgu5kfn41rpn" path="res://Scripts/main_menu.gd" id="1_28flt"]
+[ext_resource type="FontFile" uid="uid://d2p4v7k1xekrh" path="res://Assets/kenney_kenney-fonts/Fonts/Kenney Future Narrow.ttf" id="2_48xlc"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1ehe0"]
+font = ExtResource("2_48xlc")
+font_size = 47
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_28flt")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 551.0
+offset_right = 961.0
+offset_bottom = 605.0
+text = "PRESS SPACE TO BEGIN"
+label_settings = SubResource("LabelSettings_1ehe0")

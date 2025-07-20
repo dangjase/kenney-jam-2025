@@ -1,9 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://b2oihy0it3xvw"]
+[gd_scene load_steps=6 format=3 uid="uid://b2oihy0it3xvw"]
+
+[ext_resource type="FontFile" uid="uid://d2p4v7k1xekrh" path="res://Assets/kenney_kenney-fonts/Fonts/Kenney Future Narrow.ttf" id="1_e0onf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uq4kh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sijo3"]
 bg_color = Color(0.679769, 1, 0.20516, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_e0onf"]
+font = ExtResource("1_e0onf")
+font_size = 46
+outline_size = 15
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 16
+shadow_color = Color(0, 1, 0, 1)
 
 [sub_resource type="SystemFont" id="SystemFont_3gfia"]
 subpixel_positioning = 0
@@ -40,20 +50,14 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_sijo3")
 value = 50.0
 show_percentage = false
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Control/ProgressBar"]
+[node name="Label" type="Label" parent="Control/ProgressBar"]
 layout_mode = 0
-offset_top = -50.275
-offset_right = 400.0
-offset_bottom = 9.725
-theme_override_colors/font_selected_color = Color(0.488287, 0.00153903, 0.688602, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 40
+offset_left = 122.0
+offset_top = -57.0
+offset_right = 345.0
+offset_bottom = 13.0
 text = "POWER"
-scroll_active = false
-horizontal_alignment = 1
-vertical_alignment = 2
-visible_characters_behavior = 1
+label_settings = SubResource("LabelSettings_e0onf")
 
 [node name="Control2" type="Control" parent="."]
 layout_mode = 3

@@ -1,6 +1,7 @@
-[gd_scene load_steps=14 format=4 uid="uid://dnd8h0mf3buwc"]
+[gd_scene load_steps=24 format=4 uid="uid://dnd8h0mf3buwc"]
 
 [ext_resource type="PackedScene" uid="uid://cenioqnrin3u0" path="res://Scenes/player.tscn" id="1_8yv6y"]
+[ext_resource type="Script" uid="uid://bnbds4w0ijydy" path="res://Scripts/level_1_big_vertical.gd" id="1_j115u"]
 [ext_resource type="Script" uid="uid://doamjjna5onj7" path="res://Levels/txrectmap.gd" id="2_g5i3w"]
 [ext_resource type="Texture2D" uid="uid://bhivrq23pi7in" path="res://Assets/kenney_abstract-platformer/Tilesheet/tilesheet_complete.png" id="3_lo75r"]
 [ext_resource type="Texture2D" uid="uid://cryq51i726fbk" path="res://Assets/kenney_abstract-platformer/backgroundComb.png" id="4_uq4kh"]
@@ -8,7 +9,15 @@
 [ext_resource type="Script" uid="uid://bu1suok451mig" path="res://Scripts/area_2d.gd" id="7_b7yf3"]
 [ext_resource type="Script" uid="uid://sk81vd6esaqp" path="res://Scripts/camera.gd" id="8_b7yf3"]
 [ext_resource type="Script" uid="uid://dcypwalb0po2h" path="res://Scripts/screenArea.gd" id="9_3exgg"]
+[ext_resource type="FontFile" uid="uid://d2p4v7k1xekrh" path="res://Assets/kenney_kenney-fonts/Fonts/Kenney Future Narrow.ttf" id="10_uq4kh"]
 [ext_resource type="PackedScene" uid="uid://b2oihy0it3xvw" path="res://Scenes/hud.tscn" id="11_sijo3"]
+[ext_resource type="AudioStream" uid="uid://b4soerw8su6ve" path="res://Assets/songs/song 1.ogg" id="12_brsak"]
+[ext_resource type="AudioStream" uid="uid://ctg4nmsmmx1ll" path="res://Assets/songs/song 2.ogg" id="13_38inv"]
+[ext_resource type="AudioStream" uid="uid://hdab2olpf7mo" path="res://Assets/songs/song 3.ogg" id="14_gue2s"]
+[ext_resource type="AudioStream" uid="uid://bvc57c8syovs7" path="res://Assets/songs/song 4.ogg" id="15_4kgl3"]
+[ext_resource type="AudioStream" uid="uid://8yjuiopghyeo" path="res://Assets/songs/song 5.ogg" id="16_g5fb1"]
+[ext_resource type="AudioStream" uid="uid://crsrxdum6dmhp" path="res://Assets/songs/spng 6.ogg" id="17_1ux1g"]
+[ext_resource type="AudioStream" uid="uid://bmpcubhgdeaxg" path="res://Assets/songs/song 7.ogg" id="18_vggy3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3ypgb"]
 texture = ExtResource("3_lo75r")
@@ -361,7 +370,15 @@ sources/1 = SubResource("TileSetAtlasSource_3ypgb")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_b7yf3"]
 size = Vector2(2558, 1374)
 
+[sub_resource type="LabelSettings" id="LabelSettings_sijo3"]
+font = ExtResource("10_uq4kh")
+font_size = 132
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 20
+shadow_color = Color(0, 0, 0, 1)
+
 [node name="LevelVertical" type="Node2D"]
+script = ExtResource("1_j115u")
 
 [node name="Player" parent="." instance=ExtResource("1_8yv6y")]
 position = Vector2(4, 85)
@@ -454,9 +471,54 @@ script = ExtResource("9_3exgg")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera_Transition_Areas/Area5"]
 shape = SubResource("RectangleShape2D_b7yf3")
 
+[node name="Label" type="Label" parent="."]
+offset_left = -566.0
+offset_top = -363.0
+offset_right = 603.0
+offset_bottom = -62.0
+text = "HOLD SPACE
+TO CHARGE JUMP"
+label_settings = SubResource("LabelSettings_sijo3")
+horizontal_alignment = 1
+
+[node name="Song1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_brsak")
+volume_db = -34.0
+
+[node name="Song2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_38inv")
+volume_db = -34.0
+
+[node name="Song3" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_gue2s")
+volume_db = -34.0
+
+[node name="Song4" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("15_4kgl3")
+volume_db = -34.0
+
+[node name="Song5" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("16_g5fb1")
+volume_db = -34.0
+
+[node name="Song6" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("17_1ux1g")
+volume_db = -34.0
+
+[node name="Song7" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("18_vggy3")
+volume_db = -34.0
+
 [connection signal="body_entered" from="YellowCrystal/Area2D" to="YellowCrystal/Area2D" method="_on_body_entered"]
 [connection signal="body_entered" from="Camera_Transition_Areas/Area" to="Camera_Transition_Areas/Area" method="_on_body_entered"]
 [connection signal="body_entered" from="Camera_Transition_Areas/Area2" to="Camera_Transition_Areas/Area2" method="_on_body_entered"]
 [connection signal="body_entered" from="Camera_Transition_Areas/Area3" to="Camera_Transition_Areas/Area3" method="_on_body_entered"]
 [connection signal="body_entered" from="Camera_Transition_Areas/Area4" to="Camera_Transition_Areas/Area4" method="_on_body_entered"]
 [connection signal="body_entered" from="Camera_Transition_Areas/Area5" to="Camera_Transition_Areas/Area5" method="_on_body_entered"]
+[connection signal="finished" from="Song1" to="." method="_on_song_finished"]
+[connection signal="finished" from="Song2" to="." method="_on_song_finished"]
+[connection signal="finished" from="Song3" to="." method="_on_song_finished"]
+[connection signal="finished" from="Song4" to="." method="_on_song_finished"]
+[connection signal="finished" from="Song5" to="." method="_on_song_finished"]
+[connection signal="finished" from="Song6" to="." method="_on_song_finished"]
+[connection signal="finished" from="Song7" to="." method="_on_song_finished"]
