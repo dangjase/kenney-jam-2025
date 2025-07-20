@@ -49,6 +49,12 @@ const HAND_ROTATION_DOWN_LEFT: float = 45    # Pointing up-right when moving dow
 @onready var laughSound = $LaughPlayer
 @onready var launchParticles = $LaunchParticles
 
+# shader materials
+var body_material: ShaderMaterial
+var face_material: ShaderMaterial
+var hand_left_material: ShaderMaterial
+var hand_right_material: ShaderMaterial
+
 #properties
 var player_state: states
 var jump_hold_time: float
@@ -73,6 +79,7 @@ func _ready() -> void:
 	faceSprite.play('default')
 	fall_gravity = DEFAULT_FALL_GRAVITY
 	rise_gravity = DEFAULT_RISE_GRAVITY
+	_setup_brightness_shaders()
 
 func _process(delta) -> void:
 	handle_animation(delta)
@@ -80,7 +87,7 @@ func _process(delta) -> void:
 func _physics_process(delta) -> void:
 	handle_input(delta)
 	handle_physics(delta)
-	last_velocity = velocity # Store velocity before any physics calculations
+	last_velocity = velocity 
 	move_and_slide()
 
 func debug_input_vector():
@@ -188,6 +195,7 @@ func change_player_state(new_state) -> void:
 			faceSprite.position.y = 0
 			faceSprite.position.x = 0
 			velocity.x = 0  # Stop horizontal movement
+			_set_player_glow(0.0)
 			if (old_state == states.AIRBORNE):
 				landSound.play()
 		states.CHARGING:
@@ -214,6 +222,7 @@ func change_player_state(new_state) -> void:
 			launchParticles.position.x = (handRightSprite.position.x + handLeftSprite.position.x) / 2
 			launchParticles.position.y = 45
 			launchParticles.emitting = true
+			_set_player_glow(0.0) 
 		states.AIRBORNE:
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
@@ -258,8 +267,16 @@ func handle_animation(delta) -> void:
 			var target_x = direction_input * 9
 			faceSprite.position.x = lerp(float(faceSprite.position.x), float(target_x), 0.3)
 			
-			# Update face animation based on charge progress
-			if charge_progress >= 0.6:  # 60% charged
+			# TODO: remove magic numbers
+			var base_glow = charge_progress * 2.5  
+			var pulse = sin(animation_time * 8.0) * 0.4 + 0.6  
+			var final_glow = base_glow * pulse
+			
+			var glow_size = 2.0 + (charge_progress * 4.0)  
+			
+			_set_player_glow(final_glow, glow_size)
+			
+			if charge_progress >= 0.6:  
 				faceSprite.play('face_g')
 			else:
 				faceSprite.play('face_f')
@@ -425,3 +442,89 @@ func _handle_slope_slide(normal: Vector2) -> void:
 	
 	# Update animation direction based on horizontal movement
 	direction_input = sign(velocity.x)
+
+
+func _setup_brightness_shaders() -> void:
+	var shader_code = """
+	shader_type canvas_item;
+	
+	uniform float glow_intensity : hint_range(0.0, 3.0) = 0.0;
+	uniform vec3 glow_color : source_color = vec3(1.0, 0.2, 0.1);
+	uniform float glow_size : hint_range(1.0, 8.0) = 3.0;
+	
+	void fragment() {
+		vec4 tex_color = texture(TEXTURE, UV);
+		vec2 texture_size = 1.0 / TEXTURE_PIXEL_SIZE;
+		
+		// Sample surrounding pixels for outer glow
+		float glow_sample = 0.0;
+		float samples = 0.0;
+		
+		// Create glow by sampling around the current pixel
+		for(float x = -glow_size; x <= glow_size; x += 1.0) {
+			for(float y = -glow_size; y <= glow_size; y += 1.0) {
+				vec2 offset = vec2(x, y) / texture_size;
+				float distance = length(vec2(x, y));
+				
+				if(distance <= glow_size) {
+					vec4 sample_color = texture(TEXTURE, UV + offset);
+					float falloff = 1.0 - (distance / glow_size);
+					glow_sample += sample_color.a * falloff;
+					samples += 1.0;
+				}
+			}
+		}
+		
+		// Normalize glow
+		glow_sample = glow_sample / samples;
+		
+		// Create the final glow effect
+		vec3 outer_glow = glow_color * glow_intensity * glow_sample;
+		
+		// Brighten the character itself when glowing
+		vec3 character_glow = tex_color.rgb + (glow_color * glow_intensity * tex_color.a * 0.8);
+		
+		// Combine original color with both inner and outer glow
+		vec3 final_color = mix(outer_glow, character_glow, tex_color.a);
+		
+		// Calculate final alpha (character + glow)
+		float final_alpha = max(tex_color.a, glow_sample * glow_intensity * 0.3);
+		
+		COLOR = vec4(final_color, final_alpha);
+	}
+	"""
+	
+	var brightness_shader = Shader.new()
+	brightness_shader.code = shader_code
+	
+	body_material = ShaderMaterial.new()
+	body_material.shader = brightness_shader
+	bodySprite.material = body_material
+	
+	face_material = ShaderMaterial.new()
+	face_material.shader = brightness_shader
+	faceSprite.material = face_material
+	
+	hand_left_material = ShaderMaterial.new()
+	hand_left_material.shader = brightness_shader
+	handLeftSprite.material = hand_left_material
+	
+	hand_right_material = ShaderMaterial.new()
+	hand_right_material.shader = brightness_shader
+	handRightSprite.material = hand_right_material
+	
+	_set_player_glow(0.0)
+
+func _set_player_glow(intensity: float, glow_size: float = 3.0) -> void:
+	if body_material:
+		body_material.set_shader_parameter("glow_intensity", intensity)
+		body_material.set_shader_parameter("glow_size", glow_size)
+	if face_material:
+		face_material.set_shader_parameter("glow_intensity", intensity)
+		face_material.set_shader_parameter("glow_size", glow_size)
+	if hand_left_material:
+		hand_left_material.set_shader_parameter("glow_intensity", intensity)
+		hand_left_material.set_shader_parameter("glow_size", glow_size)
+	if hand_right_material:
+		hand_right_material.set_shader_parameter("glow_intensity", intensity)
+		hand_right_material.set_shader_parameter("glow_size", glow_size)
