@@ -7,7 +7,7 @@ const MAX_JUMP_HOLD_TIME: float = 1.7
 const HORIZONTAL_SPEED: float = 800
 const MAX_FALL_SPEED: float = 1800
 const MIN_JUMP_HOLD_TIME: float = 0.125
-const WALL_BOUNCE_DAMPENING: float = 1  # How much speed is kept after a wall bounce
+const WALL_BOUNCE_DAMPENING: float = 0.75  # How much speed is kept after a wall bounce
 const SLOPE_RICOCHET_DAMPENING: float = 0.65 # How much speed is kept after a slope ricochet
 const SLOPE_RICOCHET_BOOST: float = 1.1 # Multiplier for upward velocity after ricochet
 const MIN_RICOCHET_SPEED: float = 250 # Minimum falling speed to trigger ricochet
@@ -39,6 +39,11 @@ const HAND_ROTATION_DOWN_LEFT: float = 45    # Pointing up-right when moving dow
 @onready var handLeftSprite = $HandLeft
 @onready var progressbar = get_parent().get_node("HUD/Control/ProgressBar")
 @onready var falltimer = $FallTimer
+@onready var jumpSound = $JumpPlayer
+@onready var boingSound = $BoingPlayer
+@onready var chargingSound = $ChargingPlayer
+@onready var landSound = $LandPlayer
+@onready var laughSound = $LaughPlayer
 
 #properties
 var player_state: states
@@ -142,8 +147,7 @@ func handle_physics(delta) -> void:
 					velocity.y += fall_gravity * delta
 				if (is_on_wall()): #Bounce off wall
 					velocity.x = -1 * last_velocity.x * WALL_BOUNCE_DAMPENING
-					print('aaa')
-					$BoingPlayer.play()
+					boingSound.play()
 					# Update direction_input to match the new velocity direction
 					#NOTE: the player did not actually change input, but we use this to calculate the hand animation
 					direction_input = sign(velocity.x)
@@ -163,30 +167,31 @@ func change_player_state(new_state) -> void:
 	match player_state:
 		states.GROUNDED:
 			progressbar.visible = false
-			$ChargingPlayer.stop()
+			chargingSound.stop()
 			handRightSprite.play('closed')
 			handLeftSprite.play('closed')
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
 			handLeftSprite.rotation_degrees = HAND_ROTATION_UP
 			faceSprite.play('face_a')
+			landSound.play()
 			faceSprite.position.y = 0
 			faceSprite.position.x = 0
 			print(jump_start_y, " | ", global_position.y)
 			if (old_state == states.AIRBORNE 
 				and falltimer.is_stopped() 
 				and global_position.y > jump_start_y + 800):
-				$LaughPlayer.play()
+				laughSound.play()
 		states.CHARGING:
 			progressbar.visible = true
 			handRightSprite.play('open')
 			handLeftSprite.play('open')
 			handRightSprite.rotation_degrees = HAND_ROTATION_UP
 			handLeftSprite.rotation_degrees = HAND_ROTATION_UP
-			$ChargingPlayer.play()
+			chargingSound.play()
 		states.LAUNCH:
 			progressbar.visible = false
-			$ChargingPlayer.stop()
-			$ShoutPlayer.play()
+			chargingSound.stop()
+			jumpSound.play()
 			jump_start_y = global_position.y
 			handRightSprite.play('closed')
 			handLeftSprite.play('closed')
