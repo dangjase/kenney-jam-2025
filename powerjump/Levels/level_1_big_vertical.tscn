@@ -1,9 +1,11 @@
-[gd_scene load_steps=8 format=4 uid="uid://dnd8h0mf3buwc"]
+[gd_scene load_steps=11 format=4 uid="uid://dnd8h0mf3buwc"]
 
 [ext_resource type="PackedScene" uid="uid://cenioqnrin3u0" path="res://Scenes/player.tscn" id="1_8yv6y"]
 [ext_resource type="Script" uid="uid://doamjjna5onj7" path="res://Levels/txrectmap.gd" id="2_g5i3w"]
 [ext_resource type="Texture2D" uid="uid://bhivrq23pi7in" path="res://Assets/kenney_abstract-platformer/Tilesheet/tilesheet_complete.png" id="3_lo75r"]
 [ext_resource type="Texture2D" uid="uid://cryq51i726fbk" path="res://Assets/kenney_abstract-platformer/backgroundComb.png" id="4_uq4kh"]
+[ext_resource type="Texture2D" uid="uid://chuergvoyvopj" path="res://Assets/kenney_abstract-platformer/PNG/Items/yellowCrystal.png" id="6_jpd6o"]
+[ext_resource type="Script" uid="uid://bu1suok451mig" path="res://Scripts/area_2d.gd" id="7_b7yf3"]
 [ext_resource type="PackedScene" uid="uid://b2oihy0it3xvw" path="res://Scenes/hud.tscn" id="11_sijo3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3ypgb"]
@@ -346,6 +348,8 @@ physics_layer_0/collision_priority = 2.0
 physics_layer_1/collision_layer = 2
 sources/1 = SubResource("TileSetAtlasSource_3ypgb")
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_3exgg"]
+
 [node name="LevelVertical" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_8yv6y")]
@@ -373,3 +377,16 @@ stretch_mode = 2
 script = ExtResource("2_g5i3w")
 
 [node name="HUD" parent="." instance=ExtResource("11_sijo3")]
+
+[node name="YellowCrystal" type="Sprite2D" parent="."]
+position = Vector2(1202, -6231)
+scale = Vector2(2, 2)
+texture = ExtResource("6_jpd6o")
+
+[node name="Area2D" type="Area2D" parent="YellowCrystal"]
+script = ExtResource("7_b7yf3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="YellowCrystal/Area2D"]
+shape = SubResource("CircleShape2D_3exgg")
+
+[connection signal="body_entered" from="YellowCrystal/Area2D" to="YellowCrystal/Area2D" method="_on_body_entered"]
