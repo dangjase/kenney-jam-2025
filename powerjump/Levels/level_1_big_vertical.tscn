@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bhivrq23pi7in" path="res://Assets/kenney_abstract-platformer/Tilesheet/tilesheet_complete.png" id="3_lo75r"]
 [ext_resource type="Texture2D" uid="uid://kpqs7ckk7bi7" path="res://Assets/kenney_abstract-platformer/PNG/Backgrounds/set4_background.png" id="4_3ypgb"]
 [ext_resource type="PackedScene" uid="uid://c6f6cdhq0pmax" path="res://Assets/3D/tree-large.glb" id="4_7xydp"]
+[ext_resource type="Texture2D" uid="uid://cryq51i726fbk" path="res://Assets/kenney_abstract-platformer/backgroundComb.png" id="4_uq4kh"]
 [ext_resource type="PackedScene" uid="uid://dewicdj5vmpu1" path="res://Assets/3D/tree-pine-large.glb" id="5_g5i3w"]
 [ext_resource type="PackedScene" uid="uid://d0jcs0rkgku0" path="res://Assets/3D/grass.glb" id="7_jpd6o"]
 [ext_resource type="MeshLibrary" uid="uid://mrogdprd4n2v" path="res://Scenes/tiles.tres" id="8_b7yf3"]
@@ -116,13 +117,13 @@ texture_region_size = Vector2i(64, 64)
 21:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-3.02699, -32, 5.92698, -32, 5.89467, 32, -4.23355, 32)
 0:4/0 = 0
 1:4/0 = 0
-1:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 32, 32, -32, 32, -32, -32, 32)
+1:4/0/physics_layer_1/polygon_0/points = PackedVector2Array(2.25789, -2.2579, 32, -32, 32, 32, -32, 32)
 2:4/0 = 0
-2:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, -32, 32, 32, 32)
+2:4/0/physics_layer_1/polygon_0/points = PackedVector2Array(-32, -32, -2.2579, -2.2579, 32, 32, -32, 32)
 3:4/0 = 0
-3:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 32, 32, -32, 32, -32, -32, 32)
+3:4/0/physics_layer_1/polygon_0/points = PackedVector2Array(2.25789, -2.2579, 32, -32, 32, 32, -32, 32)
 4:4/0 = 0
-4:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, -0.282234, 0, 32, 32, -32, 32)
+4:4/0/physics_layer_1/polygon_0/points = PackedVector2Array(-32, -32, -2.2579, -2.2579, 32, 32, -32, 32)
 5:4/0 = 0
 5:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 6:4/0 = 0
@@ -144,13 +145,13 @@ texture_region_size = Vector2i(64, 64)
 21:4/0 = 0
 0:5/0 = 0
 1:5/0 = 0
-1:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+1:5/0/physics_layer_1/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 2:5/0 = 0
-2:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+2:5/0/physics_layer_1/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 3:5/0 = 0
-3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+3:5/0/physics_layer_1/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 4:5/0 = 0
-4:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+4:5/0/physics_layer_1/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 5:5/0 = 0
 5:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 6:5/0 = 0
@@ -312,9 +313,6 @@ physics_layer_0/collision_layer = 1
 physics_layer_1/collision_layer = 2
 sources/1 = SubResource("TileSetAtlasSource_3ypgb")
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_7xydp"]
-viewport_path = NodePath("txrectmap/subvpmap")
-
 [node name="LevelVertical" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_8yv6y")]
@@ -332,17 +330,18 @@ tile_map_data = PackedByteArray("AAD8/wIAAQAGAAUAAAD9/wIAAQAGAAUAAAD+/wIAAQAGAAU
 tile_set = SubResource("TileSet_7xydp")
 
 [node name="txrectmap" type="TextureRect" parent="."]
-visible = false
 show_behind_parent = true
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = -1208.0
-offset_top = -1340.0
-offset_right = 1354.0
-offset_bottom = -620.0
+offset_left = -1211.0
+offset_top = -7050.0
+offset_right = 1351.0
+offset_bottom = -3978.0
 grow_vertical = 2
-texture = SubResource("ViewportTexture_7xydp")
+scale = Vector2(2.5, 2.5)
+texture = ExtResource("4_uq4kh")
+stretch_mode = 2
 script = ExtResource("2_g5i3w")
 
 [node name="subvpmap" type="SubViewport" parent="txrectmap"]

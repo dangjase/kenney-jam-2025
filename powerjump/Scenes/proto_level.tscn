@@ -12,4 +12,27 @@ position = Vector2(-143, -235)
 position = Vector2(1, -235)
 zoom = Vector2(0.4, 0.4)
 
-[node name="LevelVertical" parent="." instance=ExtResource("2_5ugfd")]
+[node name="test_block2" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -308)
+
+[node name="test_block3" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -391)
+
+[node name="test_block4" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -473)
+
+[node name="test_block5" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-496, -556)
+
+[node name="test_block6" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -308)
+
+[node name="test_block7" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -391)
+
+[node name="test_block8" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -473)
+
+[node name="test_block9" parent="." instance=ExtResource("1_p4yaa")]
+position = Vector2(-968, -556)
+>>>>>>> 6c5e918ba39a03778d674982837920f696af708e
