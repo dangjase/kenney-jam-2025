@@ -1,13 +1,17 @@
 extends CharacterBody2D
 
-const DEFAULT_FALL_GRAVITY: float = 3000
-const DEFAULT_RISE_GRAVITY: float = 2200
+const DEFAULT_FALL_GRAVITY: float = 2500
+const DEFAULT_RISE_GRAVITY: float = 2500
 const JUMP_VELOCITY_MULTIPLIER: float = -1200
-const MAX_JUMP_HOLD_TIME: float = 1.3
+const MAX_JUMP_HOLD_TIME: float = 1.7
 const HORIZONTAL_SPEED: float = 800
-const MAX_FALL_SPEED: float = 2200
+const MAX_FALL_SPEED: float = 1800
 const MIN_JUMP_HOLD_TIME: float = 0.125
-const WALL_BOUNCE_DAMPENING: float = 0.5 # How much speed is kept after a wall bounce
+const WALL_BOUNCE_DAMPENING: float = 1  # How much speed is kept after a wall bounce
+const SLOPE_RICOCHET_DAMPENING: float = 0.65 # How much speed is kept after a slope ricochet
+const SLOPE_RICOCHET_BOOST: float = 1.1 # Multiplier for upward velocity after ricochet
+const MIN_RICOCHET_SPEED: float = 250 # Minimum falling speed to trigger ricochet
+const MAX_RICOCHET_SPEED: float = 1800 # Maximum speed after ricochet to prevent chaos
 
 # Animation constants
 const HAND_WAVE_SPEED: float = 5.0
@@ -135,7 +139,11 @@ func handle_physics(delta) -> void:
 					$BoingPlayer.play()
 					# Update direction_input to match the new velocity direction
 					#NOTE: the player did not actually change input, but we use this to calculate the hand animation
-					direction_input = sign(velocity.x) 
+					direction_input = sign(velocity.x)
+				
+				# Check for slope ricochet (trampoline effect)
+				_check_slope_ricochet()
+				
 				# Clamp to max fall speed
 				velocity.y = min(velocity.y, MAX_FALL_SPEED)
 		states.DEBUGFLY:
@@ -277,3 +285,71 @@ func _compute_apex_rotation(vel_y: float, dir: float) -> float:
 	if dir > 0:
 		return HAND_ROTATION_UP_RIGHT if vel_y < 0 else HAND_ROTATION_DOWN_RIGHT
 	return HAND_ROTATION_UP_LEFT if vel_y < 0 else HAND_ROTATION_DOWN_LEFT
+
+# Slope ricochet functions for trampoline effect
+
+func _check_slope_ricochet() -> void:
+	# Only check when falling with sufficient speed
+	if velocity.y < MIN_RICOCHET_SPEED:
+		return
+	
+	# Check current collisions for slopes
+	var collision_count = get_slide_collision_count()
+	for i in range(collision_count):
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+		if collider:
+			var normal = collision.get_normal()
+			
+			# Check if it's a slope (angled surface, not flat ground)
+			if _is_slope_surface(normal):
+				_handle_slope_ricochet(normal, collision.get_position())
+				return
+
+func _is_slope_surface(normal: Vector2) -> bool:
+	# A slope has significant horizontal component and isn't too steep
+	var horizontal_component = abs(normal.x)
+	var vertical_component = abs(normal.y)
+	
+	# Must have some angle (not flat) but not too steep (still walkable-ish)
+	return horizontal_component > 0.3 and vertical_component > 0.2
+
+func _handle_slope_ricochet(normal: Vector2, collision_point: Vector2) -> void:
+	print("Slope trampoline! Normal: ", normal, " Speed: ", velocity.length())
+	
+	# Calculate the angle of the slope
+	var slope_angle = normal.angle_to(Vector2.UP)
+	
+	# Ensure normal points away from the slope surface
+	if normal.y > 0:
+		normal = -normal
+	
+	# Perfect reflection using the slope normal
+	var reflected_velocity = velocity.bounce(normal)
+	
+	# Apply trampoline boost based on impact speed and slope angle
+	var impact_speed = velocity.length()
+	var speed_factor = min(impact_speed / 1200.0, 1.5)  # Reduced max boost to 1.5x
+	var angle_factor = 1.0 + abs(slope_angle) * 0.3  # Reduced angle influence
+	
+	# Apply the ricochet with boost
+	velocity = reflected_velocity * SLOPE_RICOCHET_DAMPENING * speed_factor
+	
+	# Add extra upward boost for trampoline effect
+	if velocity.y < 0:
+		velocity.y *= SLOPE_RICOCHET_BOOST * angle_factor
+	
+	# Add some horizontal push based on slope direction for dynamic bounces
+	var slope_direction = sign(normal.x)
+	velocity.x += slope_direction * 75 * speed_factor  # Reduced horizontal push
+	
+	# Cap the total speed to prevent runaway velocity
+	var total_speed = velocity.length()
+	if total_speed > MAX_RICOCHET_SPEED:
+		velocity = velocity.normalized() * MAX_RICOCHET_SPEED
+		print("Speed capped at: ", MAX_RICOCHET_SPEED)
+	
+	# Update animation direction
+	direction_input = sign(velocity.x)
+	
+	print("Ricochet result: ", velocity, " Total speed: ", velocity.length())
