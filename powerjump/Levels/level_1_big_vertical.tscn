@@ -351,7 +351,7 @@ sources/1 = SubResource("TileSetAtlasSource_3ypgb")
 [node name="LevelVertical" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_8yv6y")]
-position = Vector2(-487, -5732)
+position = Vector2(4, 85)
 floor_stop_on_slope = true
 
 [node name="LevelForeground" type="TileMapLayer" parent="."]
